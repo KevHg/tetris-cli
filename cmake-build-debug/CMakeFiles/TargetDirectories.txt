@@ -1,0 +1,3 @@
+C:/Users/Kevin Hung/Documents/_Projects/tetris-cli/cmake-build-debug/CMakeFiles/tetris-cli.dir
+C:/Users/Kevin Hung/Documents/_Projects/tetris-cli/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Kevin Hung/Documents/_Projects/tetris-cli/cmake-build-debug/CMakeFiles/rebuild_cache.dir
