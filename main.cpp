@@ -1,4 +1,5 @@
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -11,7 +12,9 @@ void setup(Space (&board)[10][10]);
 
 void displayBoard(Space (&board)[10][10]);
 
-void generateShape(char (&shape)[3][3]);
+void generateShape(char (&shape)[3][3], int type);
+
+void displayShape(char shape[3][3]);
 
 bool dropShape(Space (&board)[10][10], char shape[3][3], int column);
 
@@ -21,9 +24,16 @@ int main() {
     int column;
     bool game_over;
 
+    default_random_engine generator;
+    uniform_int_distribution<int> distribution(0, 5);
+    int number = distribution(generator); //To remove initial random value of 0
+
     setup(board);
+    generateShape(shape, number);
+
+    cout<<"Your next shape is: "<<endl;
+    displayShape(shape);
     displayBoard(board);
-    generateShape(shape);
 
     cout << "Drop on which column (0-7): ";
     cin >> column;
@@ -32,8 +42,11 @@ int main() {
         if (game_over)
             break;
 
+        number = distribution(generator);
+        generateShape(shape, number);
+        cout<<"Your next shape is: "<<endl;
+        displayShape(shape);
         displayBoard(board);
-        generateShape(shape);
 
         cout << "Drop on which column (0-7): ";
         cin >> column;
@@ -67,15 +80,49 @@ void displayBoard(Space (&board)[10][10]) {
     }
 }
 
-void generateShape(char (&shape)[3][3]) {
+void generateShape(char (&shape)[3][3], int type) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++)
             shape[i][j] = '.';
     }
-    shape[2][0] = 'X';
-    shape[2][1] = 'X';
-    shape[2][2] = 'X';
-    shape[1][1] = 'X';
+    if (type == 0) { //T-shaped (reversed)
+        shape[2][0] = 'T';
+        shape[2][1] = 'T';
+        shape[2][2] = 'T';
+        shape[1][1] = 'T';
+    } else if (type == 1) { //I-shaped
+        shape[0][1] = 'I';
+        shape[1][1] = 'I';
+        shape[2][1] = 'I';
+    } else if (type == 2) { //Z-shaped
+        shape[1][0] = 'Z';
+        shape[1][1] = 'Z';
+        shape[2][1] = 'Z';
+        shape[2][2] = 'Z';
+    } else if (type == 3) { //Block-shaped
+        shape[1][0] = 'B';
+        shape[1][1] = 'B';
+        shape[2][0] = 'B';
+        shape[2][1] = 'B';
+    } else if (type == 4) { //L-shaped
+        shape[2][0] = 'L';
+        shape[2][1] = 'L';
+        shape[2][2] = 'L';
+        shape[1][2] = 'L';
+    } else if (type == 5) { //L-shaped standing
+        shape[0][2] = 'P';
+        shape[1][2] = 'P';
+        shape[2][2] = 'P';
+        shape[0][1] = 'P';
+    }
+}
+
+void displayShape(char shape[3][3]){
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++)
+            cout<<shape[i][j]<<" ";
+        cout<<endl;
+    }
 }
 
 // Return true if initial placement unsuccessful, i.e. game over
@@ -98,7 +145,7 @@ bool dropShape(Space (&board)[10][10], char shape[3][3], int column) {
 
     int row = 1;
     while (row <= 7 && !end) {
-        //check if going down once is fine
+        //Clear original block location before checking if shifting down is possible
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (shape[i][j] != '.') {
@@ -107,6 +154,7 @@ bool dropShape(Space (&board)[10][10], char shape[3][3], int column) {
                 }
             }
         }
+        //Check if shift down is fine (not occupied), set end = true if occupied
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 if (shape[i][j] != '.' && board[row + i][column + j].occupied)
@@ -114,15 +162,7 @@ bool dropShape(Space (&board)[10][10], char shape[3][3], int column) {
             }
         }
         if (!end) {
-            //shift down
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (shape[i][j] != '.') {
-                        board[row - 1 + i][column + j].pattern = '.';
-                        board[row - 1 + i][column + j].occupied = false;
-                    }
-                }
-            }
+            //Below is not occupied, shift block down
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (shape[i][j] != '.') {
@@ -132,18 +172,18 @@ bool dropShape(Space (&board)[10][10], char shape[3][3], int column) {
                 }
             }
         } else {
+            //Below is occupied, add original block i.e. don't shift down
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     if (shape[i][j] != '.') {
-                        board[row -1 + i][column + j].pattern = shape[i][j];
-                        board[row -1 + i][column + j].occupied = true;
+                        board[row - 1 + i][column + j].pattern = shape[i][j];
+                        board[row - 1 + i][column + j].occupied = true;
                     }
                 }
             }
 
         }
         row++;
-        //displayBoard(board);
     }
     return false;
 }
