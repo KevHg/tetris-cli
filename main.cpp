@@ -52,6 +52,7 @@ int main() {
         cin >> column;
     }
     cout << "Game over! Thank you for playing!" << endl;
+    //system("pause");
     return 0;
 }
 
