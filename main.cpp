@@ -19,6 +19,8 @@ void displayShape(char shape[3][3]);
 
 bool dropShape(Space (&board)[10][10], char shape[3][3], int column);
 
+void checkBoard(Space (&board)[10][10]);
+
 int main() {
     Space board[10][10];
     char shape[3][3];
@@ -37,20 +39,21 @@ int main() {
     displayShape(shape);
     displayBoard(board);
 
-    cout << "Drop on which column (0-7): ";
+    cout << "Drop on which column (0-7, otherwise to quit): ";
     cin >> column;
     while (column >= 0 && column <= 7) {
         game_over = dropShape(board, shape, column);
         if (game_over)
             break;
 
+        checkBoard(board);
         number = distribution(generator);
         generateShape(shape, number);
         cout<<"Your next shape is: "<<endl;
         displayShape(shape);
         displayBoard(board);
 
-        cout << "Drop on which column (0-7): ";
+        cout << "Drop on which column (0-7, otherwise to quit): ";
         cin >> column;
     }
     cout << "Game over! Thank you for playing!" << endl;
@@ -189,6 +192,27 @@ bool dropShape(Space (&board)[10][10], char shape[3][3], int column) {
         row++;
     }
     return false;
+}
+
+void checkBoard(Space (&board)[10][10]){
+    bool bottomClear = true;
+    for (int j=0; j<10; j++){
+        if(!board[9][j].occupied)
+            bottomClear = false;
+    }
+    if(bottomClear){
+        cout<<"CLEAR"<<endl;
+        for(int i=8; i>=0; i--){
+            for(int j=0; j<10; j++){
+                board[i+1][j].pattern = board[i][j].pattern;
+                board[i+1][j].occupied = board[i][j].occupied;
+            }
+        }
+        for(int j=0; j<10; j++){
+            board[0][j].pattern = '.';
+            board[0][j].occupied = false;
+        }
+    }
 }
 
 
