@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <time.h>
 
 using namespace std;
 
@@ -24,9 +25,10 @@ int main() {
     int column;
     bool game_over;
 
-    default_random_engine generator;
+    default_random_engine generator((unsigned int) time(0));
     uniform_int_distribution<int> distribution(0, 5);
     int number = distribution(generator); //To remove initial random value of 0
+    number = distribution(generator);
 
     setup(board);
     generateShape(shape, number);
