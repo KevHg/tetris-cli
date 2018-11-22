@@ -19,7 +19,7 @@ void displayShape(char shape[3][3]);
 
 bool dropShape(Space (&board)[10][10], char shape[3][3], int column);
 
-void checkBoard(Space (&board)[10][10]);
+void checkBoard(Space (&board)[10][10], int &score);
 
 int main() {
     Space board[10][10];
@@ -32,10 +32,11 @@ int main() {
     int number = distribution(generator); //To remove initial random value of 0
     number = distribution(generator);
 
+    int score = 0;
     setup(board);
     generateShape(shape, number);
 
-    cout<<"Your next shape is: "<<endl;
+    cout << "Your next shape is: " << endl;
     displayShape(shape);
     displayBoard(board);
 
@@ -46,17 +47,20 @@ int main() {
         if (game_over)
             break;
 
-        checkBoard(board);
+        score += 20;
+        checkBoard(board, score);
         number = distribution(generator);
         generateShape(shape, number);
-        cout<<"Your next shape is: "<<endl;
+        cout << "Your next shape is: " << endl;
         displayShape(shape);
         displayBoard(board);
 
+        cout << "Your current score: " << score << endl;
         cout << "Drop on which column (0-7, otherwise to quit): ";
         cin >> column;
     }
     cout << "Game over! Thank you for playing!" << endl;
+    cout << "Your final score is: " << score << endl;
     //system("pause");
     return 0;
 }
@@ -123,11 +127,11 @@ void generateShape(char (&shape)[3][3], int type) {
     }
 }
 
-void displayShape(char shape[3][3]){
+void displayShape(char shape[3][3]) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++)
-            cout<<shape[i][j]<<" ";
-        cout<<endl;
+            cout << shape[i][j] << " ";
+        cout << endl;
     }
 }
 
@@ -194,21 +198,21 @@ bool dropShape(Space (&board)[10][10], char shape[3][3], int column) {
     return false;
 }
 
-void checkBoard(Space (&board)[10][10]){
+void checkBoard(Space (&board)[10][10], int &score) {
     bool bottomClear = true;
-    for (int j=0; j<10; j++){
-        if(!board[9][j].occupied)
+    for (int j = 0; j < 10; j++) {
+        if (!board[9][j].occupied)
             bottomClear = false;
     }
-    if(bottomClear){
-        cout<<"CLEAR"<<endl;
-        for(int i=8; i>=0; i--){
-            for(int j=0; j<10; j++){
-                board[i+1][j].pattern = board[i][j].pattern;
-                board[i+1][j].occupied = board[i][j].occupied;
+    if (bottomClear) {
+        score += 100;
+        for (int i = 8; i >= 0; i--) {
+            for (int j = 0; j < 10; j++) {
+                board[i + 1][j].pattern = board[i][j].pattern;
+                board[i + 1][j].occupied = board[i][j].occupied;
             }
         }
-        for(int j=0; j<10; j++){
+        for (int j = 0; j < 10; j++) {
             board[0][j].pattern = '.';
             board[0][j].occupied = false;
         }
